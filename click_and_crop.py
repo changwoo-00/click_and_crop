@@ -42,14 +42,19 @@ crop_size = int(crop_size)
 img_list = os.listdir(img_path)
 img_list = [i for i in img_list if i.endswith('.jpg') or i.endswith('.bmp')]
 print(img_list)
+print()
+print("Crop size :", end="\r")
+
 
 cv2.namedWindow("image", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("image", 800,800)
 cv2.setMouseCallback("image", mouse_crop)
 
+new_crop_size = ""
+
 for j in range(len(img_list)):
 
-    image = cv2.imread(img_path + img_list[j])
+    image = cv2.imread(os.path.join(img_path,img_list[j]))
     h, w, _ = np.shape(image)
     image_original = image.copy()
     oriImage = image.copy()
@@ -64,9 +69,24 @@ for j in range(len(img_list)):
             roi = oriImage[refPoint[0][1]:refPoint[1][1], refPoint[0][0]:refPoint[1][0]]
             cv2.imwrite("..\\crop\\{}_crop.bmp".format(img_list[j][:-4]), roi)
             break
-        cv2.waitKey(1)
 
-        
+        k = cv2.waitKey(1)
+        if k>=48 and k<=57: # numbers
+            if new_crop_size == "":
+                new_crop_size = chr(k)
+            else:
+                new_crop_size += chr(k)
+            #print(new_crop_size)
+        elif k == 8: # backspace
+            new_crop_size = new_crop_size[:-1]
+            #print(new_crop_size)
+        elif k == 13: # enter
+            crop_size = int(new_crop_size)
+            print("Crop size : ", crop_size, end="\r")
+            new_crop_size = ""
+            
+
+
  
 # close all open windows
 cv2.destroyAllWindows()
